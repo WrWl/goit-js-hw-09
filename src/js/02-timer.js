@@ -1,29 +1,53 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
-import Notiflix from 'notiflix';
+import Notiflix, { Block } from 'notiflix';
 const startBtn = document.querySelector('button[data-start]')
 startBtn.disabled = true;
-
+const DELAY = 1000;
 const daysCount = document.querySelector('[data-days]')
 const hoursCount = document.querySelector('[data-hours]')
 const minutesCount = document.querySelector('[data-minutes]')
 const secondsCount = document.querySelector('[data-seconds]')
-const date = new Date()
-let timerId = null
+const date = Date.now();
+
 const options = {
   enableTime: true,
   time_24hr: true,
-  defaultDate: date,
+  defaultDate: new Date(),
     minuteIncrement: 1,
     
     onClose(selectedDates) {
-        if (date.getTime() > selectedDates[0].getTime()) {
+        if (selectedDates[0] < date) {
             startBtn.disabled = true;
             /*alert("Please choose a date in the future") */
             Notiflix.Report.failure('Uncorrect date', 'Please choose a date in the future', 'Ok');
         }
         else {
+            
             startBtn.disabled = false;
+            const choosenDate = selectedDates[0];
+      startBtn.addEventListener('click', () => {
+        if (this.isActive) {
+          return;
+        }
+        this.isActive = true;
+        this.intervalId = setInterval(() => {
+          const currentTime = Date.now();
+          const deltaTime = choosenDate - currentTime;
+          const time = convertMs(deltaTime);
+          if (deltaTime <= 0) {
+            clearInterval(this.intervalId);
+              this.isActive = false;
+              
+              return Notiflix.Report.success('Timer is over', 'congratulations!', 'Ok');
+              
+            }
+          
+          console.log(time);
+          updateTimerOnScreen(time);
+        }, DELAY);
+      });
+    
         }
         
   },
@@ -47,18 +71,34 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 const fp = flatpickr("#datetime-picker", options);
-/*const a = fp.latestSelectedDateObj.getTime() - date.getTime()
-const counter = convertMs(a)
 
-const startTimer = () => {
-    timerId = setInterval(() => {
-    daysCount.textContent = counter.days
-    }, 1,); */
-    /*daysCount.textContent = convertMs(fp.latestSelectedDateObj.getTime() - date.getTime()).days
-    hoursCount.textContent = convertMs(fp.latestSelectedDateObj.getTime() - date.getTime()).hours
-    minutesCount.textContent = convertMs(fp.latestSelectedDateObj.getTime() - date.getTime()).minutes
-    secondsCount.textContent= convertMs(fp.latestSelectedDateObj.getTime() - date.getTime()).seconds }*/
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
+
+const updateTimerOnScreen = ({ days, hours, minutes, seconds }) => {
     
+    
+        daysCount.textContent = `${days}`.padStart(3, "0")
+        hoursCount.textContent = addLeadingZero(`${hours}`)
+        minutesCount.textContent = addLeadingZero(`${minutes}`)
+        secondsCount.textContent = addLeadingZero(`${seconds}`)
+        
+    
+   
+    
+    }
+    
+/*
+startBtn.addEventListener("click", () => {
+    if (daysCount.textContent == 0 && hoursCount.textContent == 0 && minutesCount.textContent == 0 && secondsCount.textContent == 0) {
+        clearInterval(timerId)
+    }
+    timerId = setInterval(() => {
+        console.log(timerId)
+         startTimer()
+        
+    }, 1000);
+})
 
-/*startBtn.addEventListener("click", startTimer) */
-
+ */
