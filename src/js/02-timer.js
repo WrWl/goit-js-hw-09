@@ -1,4 +1,5 @@
 import flatpickr from "flatpickr";
+
 import "flatpickr/dist/flatpickr.min.css";
 import Notiflix, { Block } from 'notiflix';
 const startBtn = document.querySelector('button[data-start]')
@@ -89,16 +90,3 @@ const updateTimerOnScreen = ({ days, hours, minutes, seconds }) => {
     
     }
     
-/*
-startBtn.addEventListener("click", () => {
-    if (daysCount.textContent == 0 && hoursCount.textContent == 0 && minutesCount.textContent == 0 && secondsCount.textContent == 0) {
-        clearInterval(timerId)
-    }
-    timerId = setInterval(() => {
-        console.log(timerId)
-         startTimer()
-        
-    }, 1000);
-})
-
- */
